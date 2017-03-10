@@ -1,4 +1,5 @@
 require 'open3'
+require 'lizard/image'
 
 module Lizard
 
