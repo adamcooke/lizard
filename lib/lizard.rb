@@ -7,6 +7,9 @@ module Lizard
 
   def self.run_command(command, input = nil)
     stdin, stdout, stderr, wait_thr = Open3.popen3(command)
+    stdin.binmode
+    stdout.binmode
+    stderr.binmode
     stdin.write(input) if input
     stdin.close
     [stdout.read, stderr.read, wait_thr.value.to_i]
