@@ -1,8 +1,6 @@
 require 'open3'
-require 'lizard/image'
 
 module Lizard
-
   def self.root
     File.expand_path('../../', __FILE__)
   end
@@ -13,5 +11,6 @@ module Lizard
     stdin.close
     [stdout.read, stderr.read, wait_thr.value.to_i]
   end
-
 end
+
+require 'lizard/image'
