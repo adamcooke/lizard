@@ -18,6 +18,10 @@ module Lizard
       @properties = identify
     end
 
+    def inspect
+      "#<Lizard::Image type=#{type}, size=#{width}x#{height}, bytes=#{@data.bytesize}>"
+    end
+
     def data
       @data
     end
