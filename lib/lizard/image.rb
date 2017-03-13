@@ -54,13 +54,13 @@ module Lizard
       end
     end
 
-    def resize(width, height)
+    def resize(width, height, type = 'jpeg')
       size = "#{width}x#{height}\\>"
       profile = "-profile " + Lizard::COLOR_PROFILES['RGB']
       if self.color_model == 'CMYK'
         profile = "-profile " + COLOR_PROFILES[self.color_model].to_s + " " + profile
       end
-      stdout, stderr, exit_code = Lizard.run_command("convert - -flatten #{profile} -resize #{size} -", @data)
+      stdout, stderr, exit_code = Lizard.run_command("convert - -flatten #{profile} -resize #{size} #{type}:-", @data)
       if exit_code == 0
         Image.new(stdout)
       else
