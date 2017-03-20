@@ -24,6 +24,9 @@ image.height      #=> 400
 # Resize the image
 resized_image = image.resize(200, 200)
 
+# Crop the image
+cropped_image = image.crop(100, 50)
+
 # Get the histogram
 image.histogram.colors                    # => An array of Lizard::Colors
 image.histogram.colors.first.red          # 23

@@ -9,4 +9,7 @@ module Lizard
   class ResizeFailed < Error
   end
 
+  class CropFailed < Error
+  end
+
 end

@@ -68,6 +68,15 @@ module Lizard
       end
     end
 
+    def crop(width, height, type = 'jpeg')
+      stdout, stderr, exit_code = Lizard.run_command("convert - -gravity center -extent #{width}x#{height} #{type}:-", @data)
+      if exit_code == 0
+        Image.new(stdout)
+      else
+        raise CropFailed, "Image could not be cropped (#{stderr})"
+      end
+    end
+
     def histogram
       @histogram ||= Histogram.new(@data)
     end
