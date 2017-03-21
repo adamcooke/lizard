@@ -23,6 +23,8 @@ image.height      #=> 400
 
 # Resize the image
 resized_image = image.resize(200, 200)
+resized_image = image.resize(200, 200, :ignore_aspect_ratio)
+resized_image = image.resize(200, 200, :fill)
 
 # Crop the image
 cropped_image = image.crop(100, 50)

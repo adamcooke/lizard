@@ -12,4 +12,7 @@ module Lizard
   class CropFailed < Error
   end
 
+  class InvalidResizeMode < Error
+  end
+
 end

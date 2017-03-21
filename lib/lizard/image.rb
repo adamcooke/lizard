@@ -1,7 +1,7 @@
-require 'tempfile'
-require 'lizard/color_profiles'
-require 'lizard/error'
-require 'lizard/histogram'
+require "tempfile"
+require "lizard/color_profiles"
+require "lizard/error"
+require "lizard/histogram"
 
 module Lizard
   class Image
@@ -48,16 +48,29 @@ module Lizard
 
     def color_model
       case color_space
-      when/CMYK/i then 'CMYK'
-      when /RGB/i then 'RBG'
+      when/CMYK/i then "CMYK"
+      when /RGB/i then "RBG"
       else nil
       end
     end
 
-    def resize(width, height, type = 'jpeg')
-      size = "#{width}x#{height}\\>"
-      profile = "-profile " + Lizard::COLOR_PROFILES['RGB']
-      if self.color_model == 'CMYK'
+    def resize(width, height, mode = :resize_down_only, type = "jpeg")
+      case mode
+      when :default
+        operator = ""
+      when :resize_down_only
+        operator = "\\>"
+      when :fill
+        operator = "^"
+      when :ignore_aspect
+        operator = "\\!"
+      else
+        raise InvalidResizeMode, "#{mode} is not a valid"
+      end
+
+      size = "#{width}x#{height}#{operator}"
+      profile = "-profile " + Lizard::COLOR_PROFILES["RGB"]
+      if self.color_model == "CMYK"
         profile = "-profile " + COLOR_PROFILES[self.color_model].to_s + " " + profile
       end
       stdout, stderr, exit_code = Lizard.run_command("convert - -flatten #{profile} -resize #{size} #{type}:-", @data)
@@ -68,7 +81,7 @@ module Lizard
       end
     end
 
-    def crop(width, height, type = 'jpeg')
+    def crop(width, height, type = "jpeg")
       stdout, stderr, exit_code = Lizard.run_command("convert - -gravity center -extent #{width}x#{height} #{type}:-", @data)
       if exit_code == 0
         Image.new(stdout)
@@ -87,7 +100,7 @@ module Lizard
       stdout, stderr, exit_code = Lizard.run_command(%Q{identify -format "Lizard||%m||%[resolution.x]x%[resolution.y]||%wx%h||%r" -}, @data)
       if exit_code == 0 && stdout =~ /\ALizard\|\|/
         _, type, resolution, size, color_space = stdout.split("||")
-        width, height = size.split('x')
+        width, height = size.split("x")
         {:type => type, :resolution => resolution, :width => width, :height => height, :size => size, :color_space => color_space}
       else
         raise NotAnImage, stderr
