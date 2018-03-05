@@ -42,5 +42,12 @@ describe Lizard::Image do
       expect(resized_image.height).to eq 100
     end
 
+    it "should raise an error when an invalid type is provided" do
+      image = Lizard::Image.new(TEST_FILES[:example])
+      expect(image.width).to eq 1000
+      tempfile = Tempfile.new
+      expect { image.resize(100, 100, :ignore_aspect, 'invalid') }.to raise_error(Lizard::InvalidFileType)
+    end
+
   end
 end

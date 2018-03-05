@@ -6,6 +6,8 @@ require "lizard/histogram"
 module Lizard
   class Image
 
+    TYPES = ['jpeg', 'png', 'gif']
+
     def self.is_image?(data)
       image = Image.new(data)
       true
@@ -59,21 +61,30 @@ module Lizard
       when :default
         operator = ""
       when :resize_down_only
-        operator = "\\>"
+        operator = ">"
       when :fill
         operator = "^"
       when :ignore_aspect
-        operator = "\\!"
+        operator = "!"
       else
         raise InvalidResizeMode, "#{mode} is not a valid"
       end
 
-      size = "#{width}x#{height}#{operator}"
-      profile = "-profile " + Lizard::COLOR_PROFILES["RGB"]
-      if self.color_model == "CMYK"
-        profile = "-profile " + COLOR_PROFILES[self.color_model].to_s + " " + profile
+      unless TYPES.include?(type)
+        raise InvalidFileType, "#{type} is not valid. Choose from #{TYPES.join(', ')}"
       end
-      stdout, stderr, exit_code = Lizard.run_command("convert - -flatten #{profile} -resize #{size} #{type}:-", @data)
+
+      command = [
+        'convert', '-', '-profile', Lizard::COLOR_PROFILES["RGB"], '-flatten',
+        '-resize', "#{width.to_i}x#{height.to_i}#{operator}",
+        "#{type}:-"
+      ]
+      if self.color_model == "CMYK"
+        command.insert(4, '-profile')
+        command.insert(5, COLOR_PROFILES[self.color_model].to_s)
+      end
+
+      stdout, stderr, exit_code = Lizard.run_command(command, @data)
       if exit_code == 0
         Image.new(stdout)
       else
@@ -82,7 +93,12 @@ module Lizard
     end
 
     def crop(width, height, type = "jpeg")
-      stdout, stderr, exit_code = Lizard.run_command("convert - -gravity center -extent #{width}x#{height} #{type}:-", @data)
+      unless TYPES.include?(type)
+        raise InvalidFileType, "#{type} is not valid. Choose from #{TYPES.join(', ')}"
+      end
+
+      command = ['convert', '-', '-gravity', 'center', '-extent', "#{width.to_i}x#{height.to_i}", "#{type}:-"]
+      stdout, stderr, exit_code = Lizard.run_command(command, @data)
       if exit_code == 0
         Image.new(stdout)
       else

@@ -14,5 +14,12 @@ describe Lizard::Image do
       expect(cropped_image.height).to eq 200
     end
 
+    it "should raise an error with invalid file type" do
+      image = Lizard::Image.new(TEST_FILES[:example])
+      expect(image.width).to eq 1000
+      tempfile = Tempfile.new
+      expect { image.crop(500, 200, 'invalid') }.to raise_error(Lizard::InvalidFileType)
+    end
+
   end
 end

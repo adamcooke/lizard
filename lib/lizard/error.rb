@@ -15,4 +15,7 @@ module Lizard
   class InvalidResizeMode < Error
   end
 
+  class InvalidFileType < Error
+  end
+
 end

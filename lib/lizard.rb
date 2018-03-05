@@ -6,7 +6,8 @@ module Lizard
   end
 
   def self.run_command(command, input = nil)
-    stdin, stdout, stderr, wait_thr = Open3.popen3(command)
+    command = [command] unless command.is_a?(Array)
+    stdin, stdout, stderr, wait_thr = Open3.popen3(*command)
     stdin.binmode
     stdout.binmode
     stderr.binmode
