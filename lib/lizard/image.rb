@@ -56,7 +56,7 @@ module Lizard
       end
     end
 
-    def resize(width, height, mode = :resize_down_only, type = "jpeg")
+    def resize(width, height, mode = :resize_down_only, type = "jpeg", options = {})
       case mode
       when :default
         operator = ""
@@ -74,11 +74,17 @@ module Lizard
         raise InvalidFileType, "#{type} is not valid. Choose from #{TYPES.join(', ')}"
       end
 
-      command = [
-        'convert', '-', '-profile', Lizard::COLOR_PROFILES["RGB"], '-flatten',
-        '-resize', "#{width.to_i}x#{height.to_i}#{operator}",
-        "#{type}:-"
-      ]
+      command = [].tap do |a|
+        a << 'convert'
+        a << '-'
+        a << '-profile'
+        a << Lizard::COLOR_PROFILES["RGB"]
+        a << '-flatten' unless options[:flatten] == false
+        a << '-resize'
+        a << "#{width.to_i}x#{height.to_i}#{operator}"
+        a << "#{type}:-"
+      end
+
       if self.color_model == "CMYK"
         command.insert(4, '-profile')
         command.insert(5, COLOR_PROFILES[self.color_model].to_s)
